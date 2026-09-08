@@ -1,132 +1,71 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0d6efd">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="調休假計算機">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>休假與加班管理</title>
   <link rel="stylesheet" href="styles.css">
-  <title>個人調休假計算機</title>
+  <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
-  <main class="app-shell">
-    <header class="app-header">
-      <p class="eyebrow">PERSONAL LEAVE TRACKER</p>
-      <h1>個人調休假計算機</h1>
-      <p class="subtitle">iPhone 版｜時數支援 0.5 小時｜排休假日可自行設定</p>
-    </header>
 
-    <section class="card">
-      <div class="section-title">⚙️ 基礎假額設定</div>
-      <div class="settings-grid">
-        <label><span>初始特休時數</span><small>例如 9 天 2 小時 = 74</small><input id="initAnnual" type="number" inputmode="decimal" min="0" step="0.5"></label>
-        <label><span>初始平日加班補休</span><input id="initCompWd" type="number" inputmode="decimal" min="0" step="0.5"></label>
-        <label><span>初始假日加班補休</span><input id="initCompWe" type="number" inputmode="decimal" min="0" step="0.5"></label>
-        <label><span>初始國定假日補休</span><input id="initHolidayComp" type="number" inputmode="decimal" min="0" step="0.5"></label>
-      </div>
-    </section>
+  <!-- 數據統計儀表板 -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">📊 額度統計</h2>
+    </div>
+    <div>
+      <p>特休剩餘：<span id="annualValue">0 天</span></p>
+      <p>平日補休：<span id="compWdValue">0 小時</span></p>
+      <p>假日補休：<span id="compWeValue">0 小時</span></p>
+      <p>國定補休：<span id="holidayCompValue">0 小時</span></p>
+      <hr style="margin: 8px 0; border: none; border-top: 1px solid #eee;">
+      <p><strong>可休總計：<span id="totalValue">0 天</span></strong></p>
+    </div>
+  </div>
 
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <div class="section-title">📅 我的排休假日</div>
-          <p class="hint no-margin">把公司排定的休假日加入後，系統會把這些日期視為「假日休」，不必是週六、週日。</p>
-        </div>
-        <span id="rosterCount" class="count-pill">0 天</span>
-      </div>
-      <div class="roster-add">
-        <input id="rosterDate" type="date" aria-label="排休日期">
-        <button id="addRosterBtn" class="secondary-btn">＋ 加入排休</button>
-      </div>
-      <div id="rosterEmpty" class="empty-state compact">尚未設定排休假日</div>
-      <div id="rosterList" class="roster-list"></div>
-    </section>
+  <!-- 新增紀錄區塊 -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">📝 登記休假 / 加班</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <input type="date" id="recordDate">
+      <select id="recordType">
+        <option value="leave_annual_wd">請特休－平日（-特休）</option>
+        <option value="leave_annual_we">請特休－假日（-特休）</option>
+        <option value="ot_wd">平日加班（+平日補休）</option>
+        <option value="ot_we">假日加班（+假日補休）</option>
+        <option value="holiday_ot">國定假日出勤（+國定補休）</option>
+        <option value="leave_comp_wd">請平日補休（-平日補休）</option>
+        <option value="leave_comp_we">請假日補休（-假日補休）</option>
+        <option value="leave_holiday_comp">請國定假日補休（-國定補休）</option>
+      </select>
+      <input type="number" id="recordHours" placeholder="小時數 (例如: 8)" step="0.5" value="8">
+      <p id="hint" style="font-size: 0.8rem; color: #666;"></p>
+      <button id="addBtn" style="padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer;">新增紀錄</button>
+    </div>
+  </div>
 
+  <!-- 滾動式異動明細 -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">📜 異動明細</h2>
+      <span class="badge" id="recordCount">0 筆</span>
+    </div>
 
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <div class="section-title">🗓️ 年度排休月曆</div>
-          <p class="hint no-margin">切換月份後，直接點日期即可加入／取消「我的排休」。藍色＝排休、金色＝國定假日。</p>
-        </div>
-        <span id="calendarMonthLabel" class="count-pill"></span>
+    <div class="records-wrapper">
+      <div id="emptyState" style="text-align: center; color: #94a3b8; padding: 20px 0; display: none;">
+        尚無任何異動紀錄
       </div>
-      <div class="calendar-toolbar">
-        <button id="prevMonthBtn" class="secondary-btn small-btn">‹ 上月</button>
-        <button id="todayMonthBtn" class="secondary-btn small-btn">回到本月</button>
-        <button id="nextMonthBtn" class="secondary-btn small-btn">下月 ›</button>
-      </div>
-      <div class="calendar-weekdays">
-        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
-      </div>
-      <div id="calendarGrid" class="calendar-grid"></div>
-      <div class="calendar-legend">
-        <span><i class="legend-dot roster"></i>我的排休</span>
-        <span><i class="legend-dot holiday"></i>國定假日</span>
-        <span><i class="legend-dot today"></i>今天</span>
-      </div>
-    </section>
+      <!-- 滾動區域 -->
+      <div id="recordsList"></div>
+    </div>
+  </div>
 
-    <section class="dashboard-grid">
-      <div class="metric metric-dark"><span>年度特休剩餘</span><strong id="annualValue">0 天 0 小時</strong></div>
-      <div class="metric metric-green"><span>平日加班補休</span><strong id="compWdValue">0 小時</strong></div>
-      <div class="metric metric-purple"><span>假日加班補休</span><strong id="compWeValue">0 小時</strong></div>
-      <div class="metric metric-blue"><span>國定假日補休</span><strong id="holidayCompValue">0 小時</strong></div>
-      <div class="metric metric-gold metric-total"><span>總計可用假額</span><strong id="totalValue">0 天 0 小時</strong></div>
-    </section>
+  <!-- 隱藏控制項與 Toast 提示 -->
+  <div id="toast"></div>
 
-    <section class="card">
-      <div class="section-title">📊 已使用統計</div>
-      <div class="stats-row">
-        <div><span>平日休</span><strong id="wdStat">0 天 0 小時</strong></div>
-        <div><span>假日休</span><strong id="weStat">0 天 0 小時</strong></div>
-        <div><span>國定假日補休</span><strong id="holidayStat">0 天 0 小時</strong></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="section-title">➕ 新增紀錄</div>
-      <div class="form-grid">
-        <label><span>日期</span><input id="recordDate" type="date"></label>
-        <label><span>類別</span><select id="recordType">
-          <option value="ot_wd">平日加班（+平日補休）</option>
-          <option value="ot_we">假日加班（+假日補休）</option>
-          <option value="holiday_ot">國定假日出勤（+國定補休）</option>
-          <option value="leave_annual_wd">請特休－平日（-特休）</option>
-          <option value="leave_annual_we">請特休－假日（-特休）</option>
-          <option value="leave_comp_wd">請平日補休（-平日補休）</option>
-          <option value="leave_comp_we">請假日補休（-假日補休）</option>
-          <option value="leave_holiday_comp">請國定假日補休（-國定補休）</option>
-        </select></label>
-        <label><span>時數（小時）</span><input id="recordHours" type="number" inputmode="decimal" min="0.5" step="0.5" value="8"></label>
-      </div>
-      <button id="addBtn" class="primary-btn">⚡ 記下一筆</button>
-      <p id="hint" class="hint"></p>
-    </section>
-
-    <section class="card records-card">
-      <div class="section-head"><div class="section-title">📜 異動明細</div><span id="recordCount" class="count-pill">0 筆</span></div>
-      <div id="emptyState" class="empty-state">目前沒有紀錄</div>
-      <div id="recordsList" class="records-list"></div>
-    </section>
-
-    <section class="card tools-card">
-      <div class="section-title">💾 資料管理</div>
-      <div class="tool-grid">
-        <button id="exportBtn" class="secondary-btn">匯出備份 JSON</button>
-        <label class="secondary-btn file-label">匯入 JSON<input id="importFile" type="file" accept="application/json,.json"></label>
-        <button id="clearBtn" class="danger-btn">清除全部資料</button>
-      </div>
-      <p class="hint">備份檔會包含額度、異動紀錄及「排休假日」設定。</p>
-    </section>
-
-    <footer class="app-footer">2026｜資料僅儲存在此裝置的瀏覽器中</footer>
-  </main>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
 </body>
 </html>
