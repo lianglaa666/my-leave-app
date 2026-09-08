@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="調休假計算機">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>個人調休假計算機</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">PERSONAL LEAVE TRACKER</p>
+        <h1>個人調休假計算機</h1>
+        <p class="subtitle">iPhone 版｜資料自動儲存於本機</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="section-title">⚙️ 基礎假額設定</div>
+      <div class="settings-grid">
+        <label>
+          <span>初始特休時數</span>
+          <small>例如 9 天 2 小時 = 74</small>
+          <input id="initAnnual" type="number" inputmode="numeric" min="0" step="1">
+        </label>
+        <label>
+          <span>初始一般加班／補休時數</span>
+          <input id="initComp" type="number" inputmode="numeric" min="0" step="1">
+        </label>
+        <label>
+          <span>初始國定假日補休時數</span>
+          <input id="initHolidayComp" type="number" inputmode="numeric" min="0" step="1">
+        </label>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="metric metric-dark">
+        <span>年度特休剩餘</span>
+        <strong id="annualValue">0 天 0 小時</strong>
+      </div>
+      <div class="metric metric-green">
+        <span>一般加班／補休可用</span>
+        <strong id="compValue">0 小時</strong>
+      </div>
+      <div class="metric metric-blue">
+        <span>國定假日補休可用</span>
+        <strong id="holidayCompValue">0 小時</strong>
+      </div>
+      <div class="metric metric-gold">
+        <span>總計可用假額</span>
+        <strong id="totalValue">0 天 0 小時</strong>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">☕ 已休假累積統計</div>
+      <div class="stats-row">
+        <div><span>平日休</span><strong id="wdStat">0 天 0 小時</strong></div>
+        <div><span>假日休</span><strong id="weStat">0 天 0 小時</strong></div>
+        <div><span>已用國定假日補休</span><strong id="holidayStat">0 天 0 小時</strong></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">➕ 新增紀錄</div>
+      <div class="form-grid">
+        <label>
+          <span>日期</span>
+          <input id="recordDate" type="date">
+        </label>
+        <label>
+          <span>類別</span>
+          <select id="recordType">
+            <option value="ot">加班（賺取一般補休）</option>
+            <option value="holiday_ot">國定假日出勤（賺取國定假日補休）</option>
+            <option value="leave_annual_wd">請特休－【平日休】（扣特休）</option>
+            <option value="leave_annual_we">請特休－【假日休】（扣特休）</option>
+            <option value="leave_comp_wd">請調補休－【平日休】（扣一般補休）</option>
+            <option value="leave_comp_we">請調補休－【假日休】（扣一般補休）</option>
+            <option value="leave_holiday_comp">請國定假日補休（扣國定假日補休）</option>
+          </select>
+        </label>
+        <label>
+          <span>時數（小時）</span>
+          <input id="recordHours" type="number" inputmode="numeric" min="1" step="1" value="8">
+        </label>
+      </div>
+      <button id="addBtn" class="primary-btn">⚡ 記下一筆</button>
+      <p id="hint" class="hint"></p>
+    </section>
+
+    <section class="card records-card">
+      <div class="section-head">
+        <div class="section-title">📜 異動與請假明細</div>
+        <span id="recordCount" class="count-pill">0 筆</span>
+      </div>
+      <div id="emptyState" class="empty-state">目前沒有紀錄</div>
+      <div id="recordsList" class="records-list"></div>
+    </section>
+
+    <section class="card tools-card">
+      <div class="section-title">💾 資料管理</div>
+      <div class="tool-grid">
+        <button id="exportBtn" class="secondary-btn">匯出備份 JSON</button>
+        <label class="secondary-btn file-label">
+          匯入 JSON
+          <input id="importFile" type="file" accept="application/json,.json">
+        </label>
+        <button id="clearBtn" class="danger-btn">清除全部資料</button>
+      </div>
+      <p class="hint">匯入功能可把你 Windows 版的 leave_data.json 帶到 iPhone。</p>
+    </section>
+
+    <footer class="app-footer">2026｜資料僅儲存在此裝置的瀏覽器中</footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
