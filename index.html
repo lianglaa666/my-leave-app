@@ -17,7 +17,7 @@
     <header class="app-header">
       <p class="eyebrow">PERSONAL LEAVE TRACKER</p>
       <h1>個人調休假計算機</h1>
-      <p class="subtitle">iPhone 版｜時數支援 0.5 小時｜資料自動儲存</p>
+      <p class="subtitle">iPhone 版｜時數支援 0.5 小時｜排休假日可自行設定</p>
     </header>
 
     <section class="card">
@@ -27,6 +27,47 @@
         <label><span>初始平日加班補休</span><input id="initCompWd" type="number" inputmode="decimal" min="0" step="0.5"></label>
         <label><span>初始假日加班補休</span><input id="initCompWe" type="number" inputmode="decimal" min="0" step="0.5"></label>
         <label><span>初始國定假日補休</span><input id="initHolidayComp" type="number" inputmode="decimal" min="0" step="0.5"></label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">📅 我的排休假日</div>
+          <p class="hint no-margin">把公司排定的休假日加入後，系統會把這些日期視為「假日休」，不必是週六、週日。</p>
+        </div>
+        <span id="rosterCount" class="count-pill">0 天</span>
+      </div>
+      <div class="roster-add">
+        <input id="rosterDate" type="date" aria-label="排休日期">
+        <button id="addRosterBtn" class="secondary-btn">＋ 加入排休</button>
+      </div>
+      <div id="rosterEmpty" class="empty-state compact">尚未設定排休假日</div>
+      <div id="rosterList" class="roster-list"></div>
+    </section>
+
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">🗓️ 年度排休月曆</div>
+          <p class="hint no-margin">切換月份後，直接點日期即可加入／取消「我的排休」。藍色＝排休、金色＝國定假日。</p>
+        </div>
+        <span id="calendarMonthLabel" class="count-pill"></span>
+      </div>
+      <div class="calendar-toolbar">
+        <button id="prevMonthBtn" class="secondary-btn small-btn">‹ 上月</button>
+        <button id="todayMonthBtn" class="secondary-btn small-btn">回到本月</button>
+        <button id="nextMonthBtn" class="secondary-btn small-btn">下月 ›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+      <div class="calendar-legend">
+        <span><i class="legend-dot roster"></i>我的排休</span>
+        <span><i class="legend-dot holiday"></i>國定假日</span>
+        <span><i class="legend-dot today"></i>今天</span>
       </div>
     </section>
 
@@ -80,7 +121,7 @@
         <label class="secondary-btn file-label">匯入 JSON<input id="importFile" type="file" accept="application/json,.json"></label>
         <button id="clearBtn" class="danger-btn">清除全部資料</button>
       </div>
-      <p class="hint">可匯入舊版 leave_data.json；舊的「一般加班」會依日期先歸入平日或假日補休。</p>
+      <p class="hint">備份檔會包含額度、異動紀錄及「排休假日」設定。</p>
     </section>
 
     <footer class="app-footer">2026｜資料僅儲存在此裝置的瀏覽器中</footer>
